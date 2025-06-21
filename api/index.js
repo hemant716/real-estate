@@ -15,7 +15,7 @@ mongoose
   })
   .catch((err) => {
     console.log(err);
-    console.log('Failed to connect to MongoDB' +MessageChannel.err);
+    console.log('Failed to connect to MongoDB');
 });
 
 const PORT =    process.env.PORT||3000;
