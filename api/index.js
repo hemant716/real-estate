@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
+import bcrypt from "bcryptjs";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 
@@ -49,7 +50,9 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 
-app.use((err, req, res, next) => {
+app.use((err, req, res,next ) => {
+  console.error(err.stack);
+              
   const statusCode = err.status || 500;
   const message = err.message || 'Something went wrong';
 
@@ -59,4 +62,5 @@ app.use((err, req, res, next) => {
     message: message,
   });
 });
+
 
