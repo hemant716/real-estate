@@ -1,12 +1,15 @@
  import express from 'express'; 
- import { test } from '../controllers/user.controller.js'; // Adjust the path as necessary
+ import { test, updateUser,deleteUser } from '../controllers/user.controller.js'; // Adjust the path as necessary
+import { verifyToken } from '../utils/verifyUser.js';
 
 
  const router = express.Router();
 
 
- router.get('/test',test);  
-
-
+ router.get('/test',test);
+ router.post('/update/:id',verifyToken,updateUser);  
+router.delete('/delete/:id', verifyToken, deleteUser);
+//router.get('/listings/:id', verifyToken, getUserListings)
+//router.get('/:id', verifyToken, getUser)
 
  export default  router;

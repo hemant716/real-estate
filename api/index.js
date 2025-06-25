@@ -7,6 +7,7 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
+import listingRouter from './routes/listing.route.js';
 
 dotenv.config();
 
@@ -14,12 +15,13 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 const crs = cors();
 
 app.use(cors({
-  origin: 'http://localhost:5173',  // frontend origin
+  origin: 'http://localhost:5173',  
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,  // if you use cookies or auth headers
+  credentials: true,  
 }));
 
 
@@ -49,6 +51,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/listing',listingRouter);
 
 app.use((err, req, res,next ) => {
   console.error(err.stack);
