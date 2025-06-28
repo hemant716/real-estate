@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import {
   getDownloadURL,
@@ -16,8 +16,8 @@ import {
   deleteUserSuccess,
   signOutUserStart,
 } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+
 export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -30,22 +30,24 @@ export default function Profile() {
   const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
 
-  // firebase storage
-  // allow read;
-  // allow write: if
-  // request.resource.size < 2 * 1024 * 1024 &&
-  // request.resource.contentType.matches('image/.*')
+  const API_URL = import.meta.env.VITE_API_URL;
 
-
-
-   const API_URL = import.meta.env.VITE_API_URL;
-
-
-
-
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        username: currentUser.username,
+        email: currentUser.email,
+        avatar: currentUser.avatar,
+      });
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setFileUploadError(true);
+        return;
+      }
       handleFileUpload(file);
     }
   }, [file]);
@@ -68,7 +70,7 @@ export default function Profile() {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, avatar: downloadURL })
+          setFormData((prev) => ({ ...prev, avatar: downloadURL }))
         );
       }
     );
@@ -122,7 +124,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch('${API_URL}/api/auth/signout');
+      const res = await fetch(`${API_URL}/api/auth/signout`);
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
@@ -130,7 +132,7 @@ export default function Profile() {
       }
       dispatch(deleteUserSuccess(data));
     } catch (error) {
-      dispatch(deleteUserFailure(data.message));
+      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -168,6 +170,7 @@ export default function Profile() {
       console.log(error.message);
     }
   };
+
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -181,42 +184,42 @@ export default function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
+          src={formData.avatar || '/default-avatar.png'}
           alt='profile'
           className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2'
         />
         <p className='text-sm self-center'>
           {fileUploadError ? (
             <span className='text-red-700'>
-              Error Image upload (image must be less than 2 mb)
+              Error uploading image (must be &lt; 2MB and valid image)
             </span>
           ) : filePerc > 0 && filePerc < 100 ? (
             <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
           ) : filePerc === 100 ? (
-            <span className='text-green-700'>Image successfully uploaded!</span>
+            <span className='text-green-700'>Image uploaded successfully!</span>
           ) : (
             ''
           )}
         </p>
         <input
           type='text'
-          placeholder='username'
-          defaultValue={currentUser.username}
+          placeholder='Username'
+          value={formData.username || ''}
           id='username'
           className='border p-3 rounded-lg'
           onChange={handleChange}
         />
         <input
           type='email'
-          placeholder='email'
+          placeholder='Email'
           id='email'
-          defaultValue={currentUser.email}
+          value={formData.email || ''}
           className='border p-3 rounded-lg'
           onChange={handleChange}
         />
         <input
           type='password'
-          placeholder='password'
+          placeholder='Password'
           onChange={handleChange}
           id='password'
           className='border p-3 rounded-lg'
@@ -248,7 +251,7 @@ export default function Profile() {
 
       <p className='text-red-700 mt-5'>{error ? error : ''}</p>
       <p className='text-green-700 mt-5'>
-        {updateSuccess ? 'User is updated successfully!' : ''}
+        {updateSuccess ? 'User updated successfully!' : ''}
       </p>
       <button onClick={handleShowListings} className='text-green-700 w-full'>
         Show Listings
@@ -257,7 +260,7 @@ export default function Profile() {
         {showListingsError ? 'Error showing listings' : ''}
       </p>
 
-      {userListings && userListings.length > 0 && (
+      {userListings.length > 0 && (
         <div className='flex flex-col gap-4'>
           <h1 className='text-center mt-7 text-2xl font-semibold'>
             Your Listings
@@ -275,7 +278,7 @@ export default function Profile() {
                 />
               </Link>
               <Link
-                className='text-slate-700 font-semibold  hover:underline truncate flex-1'
+                className='text-slate-700 font-semibold hover:underline truncate flex-1'
                 to={`/listing/${listing._id}`}
               >
                 <p>{listing.name}</p>
@@ -299,3 +302,4 @@ export default function Profile() {
     </div>
   );
 }
+

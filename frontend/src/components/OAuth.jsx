@@ -1,15 +1,18 @@
-import React from 'react'
-import { GoogleAuthProvider } from 'firebase/auth';
+import React from 'react';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 import { app } from '../firebase';
-import { getAuth, signInWithPopup } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
-import { signInFailure,signInStart,signInSuccess } from '../redux/user/userSlice';
-import { Navigate, useNavigate} from "react-router-dom";
+import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
+import { useNavigate } from "react-router-dom";
 
 export default function OAuth() {
- const dispatch= useDispatch();
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // ✅ use the hook
+
   const handleGoogleClick = async () => {
     try {
+      dispatch(signInStart());
+
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
       const result = await signInWithPopup(auth, provider);
@@ -21,25 +24,33 @@ export default function OAuth() {
         },
         body: JSON.stringify({
           name: result.user.displayName,
-           email: result.user.email,
+          email: result.user.email,
           photo: result.user.photoURL,
         }),
       });
-     const data= await res.json();
-     //console.log(data);
-     dispatch(signInSuccess(data));
-     Navigate("/sign-up");
+
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
+        return;
+      }
+
+      dispatch(signInSuccess(data));
+      navigate("/"); // ✅ use navigation after successful login
+
     } catch (error) {
       console.log("cannot login with Google", error);
+      dispatch(signInFailure(error.message));
     }
-
-  }
+  };
 
   return (
-    <button onClick={handleGoogleClick}
-      type=" button"
-      className=' bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-95 '>
-      continue with Google
+    <button
+      onClick={handleGoogleClick}
+      type="button"
+      className='bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-95'
+    >
+      Continue with Google
     </button>
-  )
+  );
 }
