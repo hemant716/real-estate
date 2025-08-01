@@ -10,13 +10,10 @@ import authRouter from "./routes/auth.route.js";
 import listingRouter from './routes/listing.route.js';
 
 dotenv.config();
-
-
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-const crs = cors();
 
 app.use(cors({
   origin: 'http://localhost:5173',  
@@ -44,10 +41,6 @@ app.listen(PORT, () => {
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
-
-
-
-
 
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);

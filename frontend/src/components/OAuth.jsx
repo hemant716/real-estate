@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function OAuth() {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // ✅ use the hook
-
+  const navigate = useNavigate(); 
+const API_URL = import.meta.env.VITE_API_URL;
   const handleGoogleClick = async () => {
     try {
       dispatch(signInStart());
@@ -17,7 +17,7 @@ export default function OAuth() {
       const auth = getAuth(app);
       const result = await signInWithPopup(auth, provider);
 
-      const res = await fetch("http://localhost:8080/api/auth/google", {
+      const res = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export default function OAuth() {
       }
 
       dispatch(signInSuccess(data));
-      navigate("/"); // ✅ use navigation after successful login
+      navigate("/"); 
 
     } catch (error) {
       console.log("cannot login with Google", error);

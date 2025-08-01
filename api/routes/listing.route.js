@@ -1,21 +1,20 @@
-import constants from "constants";
 import express from "express";
-import { createListing,deleteListing ,updateListing,getListing,getListings} from "../controllers/listing.controller.js";
+import {
+  createListing,
+  deleteListing,
+  updateListing,
+  getListing,
+  getListings,
+} from "../controllers/listing.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
-const  router= express.Router();
+const router = express.Router();
 
-router.post("/create",verifyToken,createListing);
-router.delete("/delete/:id",verifyToken,deleteListing);
-router.post('/update/:id', verifyToken, updateListing);
-router.get('/get/:id', getListing);
-router.get('/get', getListings);
-
-
-
-
-
-
-
+// RESTful route structure
+router.post("/", verifyToken, createListing);              // Create
+router.get("/", getListings);                              // List (query filters supported)
+router.get("/:id", getListing);                            // Read single listing
+router.put("/:id", verifyToken, updateListing);            // Update
+router.delete("/:id", verifyToken, deleteListing);         // Delete
 
 export default router;

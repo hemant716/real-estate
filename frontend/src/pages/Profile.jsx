@@ -170,7 +170,7 @@ export default function Profile() {
       console.log(error.message);
     }
   };
-
+console.log(error);
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -184,7 +184,7 @@ export default function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar || '/default-avatar.png'}
+          src={formData.avatar || 'frontend\src\assets\react.svg'}
           alt='profile'
           className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2'
         />

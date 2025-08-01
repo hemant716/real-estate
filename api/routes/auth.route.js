@@ -1,14 +1,17 @@
- import express from 'express';
- import { google, signin, signOut, signup } from '../controllers/auth.controller.js';
+import express from 'express';
+import {
+  googleAuth,
+  signin,
+  signOut,
+  signup
+} from '../controllers/auth.controller.js';
 
+const router = express.Router();
 
- const router= express.Router();
+// Auth routes
+router.post('/signup', signup);
+router.post('/signin', signin);
+router.post('/google', googleAuth);
+router.post('/signout', signOut); // Changed from GET to POST
 
-
- router.post("/signup",signup);
- router.post("/signin",signin);
- router.post("/google",google);
- router.get("/signout",signOut);
-
- 
- export default router;
+export default router;
